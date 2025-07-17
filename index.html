@@ -136,7 +136,7 @@
   </div>
   
   <div id="browser-container">
-    <webview id="tab1" class="active" src="https://www.google.com" allowpopups webpreferences="contextIsolation=yes"></webview>
+    <webview id="tab1" class="active" src="search.html" allowpopups preload="./webview-bridge.js" webpreferences="contextIsolation=yes, nodeIntegration=no"></webview>
   </div>
   
   <script>
@@ -160,6 +160,18 @@
     
     // Update URL input when webview navigates
     function setupWebviewListeners(webview) {
+      // Listen for messages from search page
+      webview.addEventListener('ipc-message', (event) => {
+        if (event.channel === 'navigate-to-url') {
+          webview.src = event.args[0];
+        }
+      });
+      
+      // Handle messages from webview content
+      webview.addEventListener('console-message', (e) => {
+        console.log('Webview console:', e.message);
+      });
+      
       webview.addEventListener('did-navigate', (e) => {
         if (webview.id === activeTabId) {
           urlInput.value = e.url;
@@ -197,7 +209,7 @@
     setupWebviewListeners(document.getElementById('tab1'));
     
     // Create a new tab
-    function createNewTab(url = 'https://www.google.com') {
+    function createNewTab(url = 'search.html') {
       tabCounter++;
       const tabId = `tab${tabCounter}`;
       
@@ -218,7 +230,8 @@
       webview.id = tabId;
       webview.src = url;
       webview.setAttribute('allowpopups', '');
-      webview.setAttribute('webpreferences', 'contextIsolation=yes');
+      webview.setAttribute('webpreferences', 'contextIsolation=yes, nodeIntegration=no');
+      webview.setAttribute('preload', './webview-bridge.js');
       browserContainer.appendChild(webview);
       
       // Setup event listeners
@@ -349,7 +362,7 @@
     
     // Home button
     homeBtn.addEventListener('click', () => {
-      navigateTo('https://www.google.com');
+      navigateTo('search.html');
     });
   </script>
 </body>

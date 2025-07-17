@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Brick Browser Search</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background-color: #f9f9f9;
+    }
+    
+    .search-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      padding: 20px;
+    }
+    
+    .logo {
+      font-size: 36px;
+      font-weight: bold;
+      margin-bottom: 30px;
+      color: #333;
+    }
+    
+    .logo span {
+      color: #4285f4;
+    }
+    
+    .search-box {
+      width: 100%;
+      max-width: 600px;
+      position: relative;
+      margin-bottom: 20px;
+    }
+    
+    .search-input {
+      width: 100%;
+      padding: 15px 20px;
+      font-size: 18px;
+      border: 1px solid #ddd;
+      border-radius: 24px;
+      outline: none;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      transition: box-shadow 0.3s ease;
+    }
+    
+    .search-input:focus {
+      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    .search-button {
+      background-color: #4285f4;
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    
+    .search-button:hover {
+      background-color: #3367d6;
+    }
+    
+    .search-options {
+      display: flex;
+      gap: 20px;
+      margin-top: 20px;
+    }
+    
+    .search-option {
+      padding: 10px 15px;
+      background-color: #fff;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.2s ease;
+    }
+    
+    .search-option:hover {
+      background-color: #f0f0f0;
+    }
+    
+    .footer {
+      padding: 20px;
+      background-color: #f1f1f1;
+      text-align: center;
+      font-size: 14px;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="search-container">
+    <div class="logo">Brick<span>Search</span></div>
+    
+    <div class="search-box">
+      <input type="text" id="searchInput" class="search-input" placeholder="Search the web..." autofocus>
+    </div>
+    
+    <button id="searchButton" class="search-button">Search</button>
+    
+    <div class="search-options">
+      <div class="search-option" data-type="web">Web</div>
+      <div class="search-option" data-type="images">Images</div>
+      <div class="search-option" data-type="news">News</div>
+      <div class="search-option" data-type="videos">Videos</div>
+    </div>
+  </div>
+  
+  <div class="footer">
+    © 2025 Brick Browser - Built brick by brick
+  </div>
+  
+  <script>
+    // Get DOM elements
+    const searchInput = document.getElementById('searchInput');
+    const searchButton = document.getElementById('searchButton');
+    const searchOptions = document.querySelectorAll('.search-option');
+    
+    // Default search type
+    let searchType = 'web';
+    
+    // Handle search
+    function performSearch() {
+      const query = searchInput.value.trim();
+      if (!query) return;
+      
+      let searchUrl;
+      
+      switch (searchType) {
+        case 'images':
+          searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}&tbm=isch`;
+          break;
+        case 'news':
+          searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}&tbm=nws`;
+          break;
+        case 'videos':
+          searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}&tbm=vid`;
+          break;
+        default:
+          searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+      }
+      
+      // Navigate directly
+      window.location.href = searchUrl;
+    }
+    
+    // Search button click
+    searchButton.addEventListener('click', performSearch);
+    
+    // Enter key in search input
+    searchInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        performSearch();
+      }
+    });
+    
+    // Search options
+    searchOptions.forEach(option => {
+      option.addEventListener('click', () => {
+        // Update active option
+        searchOptions.forEach(opt => opt.style.fontWeight = 'normal');
+        option.style.fontWeight = 'bold';
+        
+        // Update search type
+        searchType = option.dataset.type;
+      });
+    });
+    
+    // Set initial active option
+    document.querySelector('[data-type="web"]').style.fontWeight = 'bold';
+  </script>
+</body>
+</html>

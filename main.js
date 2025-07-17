@@ -39,11 +39,12 @@ function createWindow() {
     width: 1200,
     height: 800,
     webPreferences: {
-      nodeIntegration: false,
+      preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
-      enableRemoteModule: false,
+      nodeIntegration: false,
       webviewTag: true,
-      preload: path.join(__dirname, 'preload.js')
+      webSecurity: true,
+      allowRunningInsecureContent: false
     },
     icon: path.join(__dirname, 'assets', 'icon.png'),
     frame: store.get('settings.layout.customTitleBar', false) ? false : true,
