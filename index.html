@@ -14,6 +14,64 @@
       overflow: hidden;
     }
     
+    /* Tab bar styles */
+    .tab-bar {
+      display: flex;
+      background: #e0e0e0;
+      padding: 5px 5px 0 5px;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+    
+    .tab {
+      display: flex;
+      align-items: center;
+      padding: 8px 15px;
+      margin-right: 4px;
+      background: #d0d0d0;
+      border-radius: 5px 5px 0 0;
+      cursor: pointer;
+      max-width: 200px;
+      min-width: 100px;
+      position: relative;
+    }
+    
+    .tab.active {
+      background: #f1f1f1;
+      border-bottom: 2px solid #4285f4;
+    }
+    
+    .tab-title {
+      flex: 1;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    
+    .tab-close {
+      margin-left: 8px;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+    }
+    
+    .tab-close:hover {
+      background: #bbb;
+    }
+    
+    .new-tab {
+      padding: 8px 12px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    
+    /* Controls styles */
     .controls {
       display: flex;
       padding: 10px;
@@ -51,10 +109,23 @@
     webview {
       flex: 1;
       border: none;
+      display: none;
+    }
+    
+    webview.active {
+      display: flex;
     }
   </style>
 </head>
 <body>
+  <div class="tab-bar" id="tabBar">
+    <div class="tab active" data-tab-id="tab1">
+      <div class="tab-title">New Tab</div>
+      <div class="tab-close">&times;</div>
+    </div>
+    <button class="new-tab" id="newTabBtn">+</button>
+  </div>
+
   <div class="controls">
     <button class="nav-btn" id="backBtn">&larr;</button>
     <button class="nav-btn" id="forwardBtn">&rarr;</button>
@@ -65,12 +136,16 @@
   </div>
   
   <div id="browser-container">
-    <webview id="webview" src="https://www.google.com" allowpopups webpreferences="contextIsolation=yes"></webview>
+    <webview id="tab1" class="active" src="https://www.google.com" allowpopups webpreferences="contextIsolation=yes"></webview>
   </div>
   
   <script>
-    // Get DOM elements
-    const webview = document.getElementById('webview');
+    // Tab management
+    let activeTabId = 'tab1';
+    let tabCounter = 1;
+    const tabBar = document.getElementById('tabBar');
+    const newTabBtn = document.getElementById('newTabBtn');
+    const browserContainer = document.getElementById('browser-container');
     const urlInput = document.getElementById('urlInput');
     const backBtn = document.getElementById('backBtn');
     const forwardBtn = document.getElementById('forwardBtn');
@@ -78,16 +153,127 @@
     const homeBtn = document.getElementById('homeBtn');
     const goBtn = document.getElementById('goBtn');
     
-    // Update URL input when webview navigates
-    webview.addEventListener('did-navigate', (e) => {
-      urlInput.value = e.url;
-      document.title = 'Brick Browser - ' + e.url;
-    });
+    // Get active webview
+    function getActiveWebview() {
+      return document.getElementById(activeTabId);
+    }
     
-    // Update title when page title changes
-    webview.addEventListener('page-title-updated', (e) => {
-      document.title = 'Brick Browser - ' + e.title;
-    });
+    // Update URL input when webview navigates
+    function setupWebviewListeners(webview) {
+      webview.addEventListener('did-navigate', (e) => {
+        if (webview.id === activeTabId) {
+          urlInput.value = e.url;
+          document.title = 'Brick Browser - ' + e.url;
+        }
+      });
+      
+      // Update title when page title changes
+      webview.addEventListener('page-title-updated', (e) => {
+        if (webview.id === activeTabId) {
+          document.title = 'Brick Browser - ' + e.title;
+        }
+        
+        // Update tab title
+        const tabElement = document.querySelector(`[data-tab-id="${webview.id}"] .tab-title`);
+        if (tabElement) {
+          tabElement.textContent = e.title || 'New Tab';
+        }
+      });
+      
+      // Initialize with URL
+      webview.addEventListener('dom-ready', () => {
+        if (webview.id === activeTabId) {
+          urlInput.value = webview.src;
+        }
+      });
+      
+      // Log any webview errors
+      webview.addEventListener('did-fail-load', (e) => {
+        console.error('WebView failed to load:', e);
+      });
+    }
+    
+    // Setup initial tab
+    setupWebviewListeners(document.getElementById('tab1'));
+    
+    // Create a new tab
+    function createNewTab(url = 'https://www.google.com') {
+      tabCounter++;
+      const tabId = `tab${tabCounter}`;
+      
+      // Create tab element
+      const tabElement = document.createElement('div');
+      tabElement.className = 'tab';
+      tabElement.dataset.tabId = tabId;
+      tabElement.innerHTML = `
+        <div class="tab-title">New Tab</div>
+        <div class="tab-close">&times;</div>
+      `;
+      
+      // Insert before the new tab button
+      tabBar.insertBefore(tabElement, newTabBtn);
+      
+      // Create webview
+      const webview = document.createElement('webview');
+      webview.id = tabId;
+      webview.src = url;
+      webview.setAttribute('allowpopups', '');
+      webview.setAttribute('webpreferences', 'contextIsolation=yes');
+      browserContainer.appendChild(webview);
+      
+      // Setup event listeners
+      setupWebviewListeners(webview);
+      
+      // Switch to the new tab
+      switchToTab(tabId);
+      
+      return tabId;
+    }
+    
+    // Switch to a tab
+    function switchToTab(tabId) {
+      // Update active tab
+      activeTabId = tabId;
+      
+      // Update tab UI
+      document.querySelectorAll('.tab').forEach(tab => {
+        tab.classList.remove('active');
+      });
+      document.querySelector(`[data-tab-id="${tabId}"]`).classList.add('active');
+      
+      // Update webview UI
+      document.querySelectorAll('webview').forEach(webview => {
+        webview.classList.remove('active');
+      });
+      const activeWebview = document.getElementById(tabId);
+      activeWebview.classList.add('active');
+      
+      // Update URL input
+      urlInput.value = activeWebview.src;
+    }
+    
+    // Close a tab
+    function closeTab(tabId) {
+      // Don't close the last tab
+      if (document.querySelectorAll('.tab').length <= 1) {
+        return;
+      }
+      
+      // Remove tab element
+      const tabElement = document.querySelector(`[data-tab-id="${tabId}"]`);
+      const isActiveTab = tabElement.classList.contains('active');
+      tabElement.remove();
+      
+      // Remove webview
+      const webview = document.getElementById(tabId);
+      webview.remove();
+      
+      // If we closed the active tab, switch to the first available tab
+      if (isActiveTab) {
+        const firstTabId = document.querySelector('.tab').dataset.tabId;
+        switchToTab(firstTabId);
+      }
+    }
     
     // Handle URL input
     function navigateTo(url) {
@@ -102,8 +288,30 @@
         }
       }
       
-      webview.src = url;
+      const activeWebview = getActiveWebview();
+      activeWebview.src = url;
     }
+    
+    // Tab click event delegation
+    tabBar.addEventListener('click', (e) => {
+      // Handle close button click
+      if (e.target.classList.contains('tab-close')) {
+        const tabElement = e.target.closest('.tab');
+        closeTab(tabElement.dataset.tabId);
+        return;
+      }
+      
+      // Handle tab click (switch to tab)
+      const tabElement = e.target.closest('.tab');
+      if (tabElement) {
+        switchToTab(tabElement.dataset.tabId);
+      }
+    });
+    
+    // New tab button
+    newTabBtn.addEventListener('click', () => {
+      createNewTab();
+    });
     
     // Navigate when pressing Enter in URL input
     urlInput.addEventListener('keypress', (e) => {
@@ -119,37 +327,29 @@
     
     // Back button
     backBtn.addEventListener('click', () => {
-      if (webview.canGoBack()) {
-        webview.goBack();
+      const activeWebview = getActiveWebview();
+      if (activeWebview.canGoBack()) {
+        activeWebview.goBack();
       }
     });
     
     // Forward button
     forwardBtn.addEventListener('click', () => {
-      if (webview.canGoForward()) {
-        webview.goForward();
+      const activeWebview = getActiveWebview();
+      if (activeWebview.canGoForward()) {
+        activeWebview.goForward();
       }
     });
     
     // Refresh button
     refreshBtn.addEventListener('click', () => {
-      webview.reload();
+      const activeWebview = getActiveWebview();
+      activeWebview.reload();
     });
     
     // Home button
     homeBtn.addEventListener('click', () => {
       navigateTo('https://www.google.com');
-    });
-    
-    // Initialize with Google
-    webview.addEventListener('dom-ready', () => {
-      console.log('WebView DOM ready');
-      urlInput.value = webview.src;
-    });
-    
-    // Log any webview errors
-    webview.addEventListener('did-fail-load', (e) => {
-      console.error('WebView failed to load:', e);
     });
   </script>
 </body>
