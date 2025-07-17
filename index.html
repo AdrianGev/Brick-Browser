@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Brick Browser</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+    
+    .controls {
+      display: flex;
+      padding: 10px;
+      background: #f1f1f1;
+      border-bottom: 1px solid #ddd;
+    }
+    
+    .nav-btn {
+      margin-right: 10px;
+      padding: 5px 10px;
+      background: #e0e0e0;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    
+    .nav-btn:hover {
+      background: #d0d0d0;
+    }
+    
+    #urlInput {
+      flex: 1;
+      padding: 5px 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      margin-right: 10px;
+    }
+    
+    #browser-container {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+    
+    webview {
+      flex: 1;
+      border: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="controls">
+    <button class="nav-btn" id="backBtn">&larr;</button>
+    <button class="nav-btn" id="forwardBtn">&rarr;</button>
+    <button class="nav-btn" id="refreshBtn">&#x21bb;</button>
+    <button class="nav-btn" id="homeBtn">Home</button>
+    <input type="text" id="urlInput" placeholder="Enter URL or search term">
+    <button class="nav-btn" id="goBtn">Go</button>
+  </div>
+  
+  <div id="browser-container">
+    <webview id="webview" src="https://www.google.com" allowpopups webpreferences="contextIsolation=yes"></webview>
+  </div>
+  
+  <script>
+    // Get DOM elements
+    const webview = document.getElementById('webview');
+    const urlInput = document.getElementById('urlInput');
+    const backBtn = document.getElementById('backBtn');
+    const forwardBtn = document.getElementById('forwardBtn');
+    const refreshBtn = document.getElementById('refreshBtn');
+    const homeBtn = document.getElementById('homeBtn');
+    const goBtn = document.getElementById('goBtn');
+    
+    // Update URL input when webview navigates
+    webview.addEventListener('did-navigate', (e) => {
+      urlInput.value = e.url;
+      document.title = 'Brick Browser - ' + e.url;
+    });
+    
+    // Update title when page title changes
+    webview.addEventListener('page-title-updated', (e) => {
+      document.title = 'Brick Browser - ' + e.title;
+    });
+    
+    // Handle URL input
+    function navigateTo(url) {
+      // Add http:// if no protocol specified
+      if (!/^https?:\/\//i.test(url)) {
+        // Check if it's a valid domain
+        if (url.includes('.') && !url.includes(' ')) {
+          url = 'http://' + url;
+        } else {
+          // Treat as a search query
+          url = 'https://www.google.com/search?q=' + encodeURIComponent(url);
+        }
+      }
+      
+      webview.src = url;
+    }
+    
+    // Navigate when pressing Enter in URL input
+    urlInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        navigateTo(urlInput.value);
+      }
+    });
+    
+    // Go button
+    goBtn.addEventListener('click', () => {
+      navigateTo(urlInput.value);
+    });
+    
+    // Back button
+    backBtn.addEventListener('click', () => {
+      if (webview.canGoBack()) {
+        webview.goBack();
+      }
+    });
+    
+    // Forward button
+    forwardBtn.addEventListener('click', () => {
+      if (webview.canGoForward()) {
+        webview.goForward();
+      }
+    });
+    
+    // Refresh button
+    refreshBtn.addEventListener('click', () => {
+      webview.reload();
+    });
+    
+    // Home button
+    homeBtn.addEventListener('click', () => {
+      navigateTo('https://www.google.com');
+    });
+    
+    // Initialize with Google
+    webview.addEventListener('dom-ready', () => {
+      console.log('WebView DOM ready');
+      urlInput.value = webview.src;
+    });
+    
+    // Log any webview errors
+    webview.addEventListener('did-fail-load', (e) => {
+      console.error('WebView failed to load:', e);
+    });
+  </script>
+</body>
+</html>

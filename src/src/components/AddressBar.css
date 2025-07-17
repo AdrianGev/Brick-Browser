@@ -1,0 +1,68 @@
+.address-bar {
+  display: flex;
+  align-items: center;
+  padding: 8px 16px;
+  background-color: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.navigation-buttons {
+  display: flex;
+  margin-right: 16px;
+}
+
+.nav-button {
+  background: none;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 8px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background-color var(--transition-speed);
+}
+
+.nav-button:hover {
+  background-color: rgba(128, 128, 128, 0.2);
+}
+
+.nav-button:active {
+  background-color: rgba(128, 128, 128, 0.3);
+}
+
+.url-form {
+  flex: 1;
+}
+
+.url-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.search-icon {
+  position: absolute;
+  left: 10px;
+  color: var(--text-secondary);
+}
+
+.url-input {
+  width: 100%;
+  padding: 10px 10px 10px 40px;
+  border-radius: 20px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  font-size: 14px;
+  outline: none;
+  transition: box-shadow var(--transition-speed);
+}
+
+.url-input:focus {
+  box-shadow: 0 0 0 2px var(--accent-color);
+}

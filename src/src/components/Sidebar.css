@@ -1,0 +1,112 @@
+.sidebar {
+  display: flex;
+  width: 60px;
+  height: 100%;
+  background-color: var(--bg-secondary);
+  border-right: 1px solid var(--border-color);
+  transition: width var(--transition-speed);
+  overflow: hidden;
+}
+
+.sidebar.expanded {
+  width: 250px;
+}
+
+.sidebar-icons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 0;
+  width: 60px;
+  background-color: var(--bg-secondary);
+}
+
+.sidebar-icon-button {
+  background: none;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background-color var(--transition-speed), color var(--transition-speed);
+}
+
+.sidebar-icon-button:hover {
+  background-color: rgba(128, 128, 128, 0.2);
+}
+
+.sidebar-icon-button.active {
+  color: var(--accent-color);
+  background-color: rgba(128, 128, 128, 0.1);
+}
+
+.theme-toggle {
+  margin-top: auto;
+}
+
+.sidebar-content {
+  flex: 1;
+  padding: 16px;
+  background-color: var(--bg-primary);
+  overflow-y: auto;
+}
+
+.bookmarks-panel {
+  width: 190px;
+}
+
+.bookmark-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.bookmark-item {
+  display: flex;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.bookmark-favicon {
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+}
+
+.bookmark-link {
+  color: var(--text-primary);
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bookmark-link:hover {
+  text-decoration: underline;
+}
+
+.no-bookmarks {
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.add-extension-button {
+  background-color: var(--accent-color);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 8px 16px;
+  margin-top: 16px;
+  cursor: pointer;
+  transition: background-color var(--transition-speed);
+}
+
+.add-extension-button:hover {
+  background-color: var(--accent-color-dark, #2980b9);
+}

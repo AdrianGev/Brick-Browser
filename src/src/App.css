@@ -1,0 +1,96 @@
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+.app.light {
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f5f5;
+  --text-primary: #333333;
+  --text-secondary: #666666;
+  --accent-color: #3498db;
+  --border-color: #e0e0e0;
+}
+
+.app.dark {
+  --bg-primary: #1e1e1e;
+  --bg-secondary: #2d2d2d;
+  --text-primary: #f0f0f0;
+  --text-secondary: #cccccc;
+  --accent-color: #61dafb;
+  --border-color: #444444;
+}
+
+.browser-container {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+.main-content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* Customizable tab positions */
+.tab-position-top .tab-bar {
+  order: 0;
+}
+
+.tab-position-top .address-bar {
+  order: 1;
+}
+
+.tab-position-top .browser-view {
+  order: 2;
+}
+
+.tab-position-bottom .tab-bar {
+  order: 2;
+}
+
+.tab-position-bottom .address-bar {
+  order: 0;
+}
+
+.tab-position-bottom .browser-view {
+  order: 1;
+}
+
+.tab-position-left .tab-bar {
+  flex-direction: column;
+  width: 200px;
+}
+
+.tab-position-right .tab-bar {
+  flex-direction: column;
+  width: 200px;
+  order: 2;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .browser-container {
+    flex-direction: column;
+  }
+  
+  .sidebar {
+    width: 100%;
+    height: auto;
+  }
+}
